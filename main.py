@@ -10,20 +10,21 @@ def from_excel_to_db():
     for xls_file in xls_files_list:
         print(xls_file)
     df = pd.read_excel(xls_file_dir_name + "test.xlsx", header=None, skiprows=2)
+    df.columns = db_column_name_list
     print(df)
+    conn = create_connection(sqlite_db_file)
+    with conn:
+        curs = conn.cursor()
+        try:
+            df.to_sql(sales_table_name, conn, if_exists="append", index=False, chunksize=1000)
+        except sqlite3.Error as e:
+            print(f"Error: {e}")
+        finally:
+            if curs:
+                curs.close()
 
 
 def main():
-    # conn = create_connection(sqlite_db_file)
-    # with conn:
-    #     curs = conn.cursor()
-    #     try:
-    #
-    #     except sqlite3.Error as e:
-    #         print(f"Error: {e}")
-    #     finally:
-    #         if curs:
-    #             curs.close()
     from_excel_to_db()
 
 

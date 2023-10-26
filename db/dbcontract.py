@@ -22,7 +22,12 @@ sum_of_sales_col = "sum_of_sales"
 product_cost_price_col = "product_cost_price"
 product_control_cost_price_col = "product_control_cost_price"
 
-sqlite_db_file = "../data/sqlite.db"
+db_column_name_list = [deleted_col, registered_col, doc_number_col, doc_date_col, doc_date_time_col, organization_col,
+                       operator_col, ta_brand_col, ta_model_col, ta_serial_col, ta_type_col, division_col, tt_name_col,
+                       tt_location_col, ta_cell_number_col, ta_cell_is_snack_col, product_col, ta_cell_deficit_col,
+                       number_of_sales_col, sum_of_sales_col, product_cost_price_col, product_control_cost_price_col]
+
+sqlite_db_file = "./data/sqlite.db"
 sales_table_name = "sales"
 
 int_field_type = "INTEGER"
@@ -52,7 +57,8 @@ CREATE TABLE {sales_table_name} (
     {number_of_sales_col} {int_field_type},
     {sum_of_sales_col} {int_field_type},
     {product_cost_price_col} {real_field_type},
-    {product_control_cost_price_col} {real_field_type}
-    PRIMARY KEY ({number_of_sales_col}, {doc_date_col})
+    {product_control_cost_price_col} {real_field_type},
+    PRIMARY KEY ({doc_number_col}, {doc_date_col}, {ta_cell_number_col})
 );
 """
+drop_table_sales = f"""DROP TABLE {sales_table_name};"""
