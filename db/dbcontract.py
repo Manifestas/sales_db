@@ -27,13 +27,22 @@ db_column_name_list = [deleted_col, registered_col, doc_number_col, doc_date_col
                        tt_location_col, ta_cell_number_col, ta_cell_is_snack_col, product_col, ta_cell_deficit_col,
                        number_of_sales_col, sum_of_sales_col, product_cost_price_col, product_control_cost_price_col]
 
+# vending machine type in db
+coffee_ta_type = "Кофейный ТА"
+snack_ta_type = "Снековый ТА"
+
+# db, table names
 sqlite_db_file = "./data/sqlite.db"
 sales_table_name = "sales"
 
+
+# column types
 int_field_type = "INTEGER"
 real_field_type = "REAL"
 text_field_type = "TEXT"
 
+
+# query's
 create_table_sales = f"""
 CREATE TABLE {sales_table_name} (
     {deleted_col} {int_field_type},
@@ -62,3 +71,17 @@ CREATE TABLE {sales_table_name} (
 );
 """
 drop_table_sales = f"""DROP TABLE {sales_table_name};"""
+
+query_sales_group_by_div = f"""SELECT
+                                    {division_col},
+                                    SUM({number_of_sales_col}),
+                                    SUM({sum_of_sales_col}) as {sum_of_sales_col}
+                                FROM {sales_table_name}
+                                WHERE
+                                    {deleted_col} = 0 AND
+                                    {registered_col} = 1 AND
+                                    {ta_type_col} = ? AND
+                                    {ta_cell_number_col} <= 90 AND
+                                    {doc_date_col} = ?
+                                GROUP BY {division_col}
+                                ORDER BY {sum_of_sales_col} DESC;"""

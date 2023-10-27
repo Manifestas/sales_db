@@ -26,6 +26,7 @@ def from_excel_to_db():
                 df.columns = db_column_name_list
                 print(xls_file + " прочитан.")
                 print(df[[doc_date_col, organization_col]].head(2))
+
                 df.to_sql(sales_table_name, conn, if_exists="append", index=False, chunksize=1000)
                 print(xls_file + " копирован в БД")
         except sqlite3.Error as e:
@@ -48,8 +49,21 @@ def simple_read_query():
                 curs.close()
 
 
+def select_query():
+    conn = create_connection(sqlite_db_file)
+    with conn:
+        curs = conn.cursor()
+        try:
+            print(execute_read_query(conn, query_sales_group_by_div, (coffee_ta_type, "27.10.2022")))
+        except sqlite3.Error as e:
+            print(f"Error: {e}")
+        finally:
+            if curs:
+                curs.close()
+
+
 def main():
-    simple_read_query()
+    select_query()
 
 
 if __name__ == '__main__':
