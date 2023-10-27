@@ -74,8 +74,9 @@ drop_table_sales = f"""DROP TABLE {sales_table_name};"""
 
 query_sales_group_by_div = f"""SELECT
                                     {division_col},
-                                    SUM({number_of_sales_col}),
-                                    SUM({sum_of_sales_col}) as {sum_of_sales_col}
+                                    SUM({number_of_sales_col}) AS 'Кол-во',
+                                    SUM({sum_of_sales_col}) AS Сумма,
+                                    SUM({sum_of_sales_col}) - SUM({product_control_cost_price_col}) AS ВП
                                 FROM {sales_table_name}
                                 WHERE
                                     {deleted_col} = 0 AND
@@ -84,4 +85,4 @@ query_sales_group_by_div = f"""SELECT
                                     {ta_cell_number_col} <= 90 AND
                                     {doc_date_col} = ?
                                 GROUP BY {division_col}
-                                ORDER BY {sum_of_sales_col} DESC;"""
+                                ORDER BY Сумма DESC;"""
