@@ -13,7 +13,7 @@ def from_excel_to_db():
     with conn:
         curs = conn.cursor()
         try:
-            execute_query(conn, create_table_sales)
+            execute_query(conn, create_table_sales_raw)
             # print(execute_read_query(conn, "PRAGMA encoding;"))
             for xls_file in xls_files_list:
                 """in sheet.py comment 3 lines:
@@ -27,7 +27,7 @@ def from_excel_to_db():
                 print(xls_file + " прочитан.")
                 print(df[[doc_date_col, organization_col]].head(2))
 
-                df.to_sql(sales_table_name, conn, if_exists="append", index=False, chunksize=1000)
+                df.to_sql(sales_raw_table_name, conn, if_exists="append", index=False, chunksize=1000)
                 print(xls_file + " копирован в БД")
         except sqlite3.Error as e:
             print(f"Error: {e}")
@@ -41,7 +41,7 @@ def simple_read_query():
     with conn:
         curs = conn.cursor()
         try:
-            print(execute_read_query(conn, "PRAGMA encoding;"))
+            print(execute_read_query(conn, f"ALTER TABLE sales RENAME TO {sales_raw_table_name}"))
         except sqlite3.Error as e:
             print(f"Error: {e}")
         finally:
@@ -63,7 +63,7 @@ def select_query():
 
 
 def main():
-    select_query()
+    simple_read_query()
 
 
 if __name__ == '__main__':

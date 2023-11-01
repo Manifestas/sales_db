@@ -1,3 +1,7 @@
+# db, table names
+sqlite_db_file = "./data/sqlite.db"
+sales_raw_table_name = "sales_raw"
+
 # column names
 deleted_col = "deleted"
 registered_col = "registered"
@@ -27,14 +31,11 @@ db_column_name_list = [deleted_col, registered_col, doc_number_col, doc_date_col
                        tt_location_col, ta_cell_number_col, ta_cell_is_snack_col, product_col, ta_cell_deficit_col,
                        number_of_sales_col, sum_of_sales_col, product_cost_price_col, product_control_cost_price_col]
 
+sales_table_name = "sales"
+
 # vending machine type in db
 coffee_ta_type = "Кофейный ТА"
 snack_ta_type = "Снековый ТА"
-
-# db, table names
-sqlite_db_file = "./data/sqlite.db"
-sales_table_name = "sales"
-
 
 # column types
 int_field_type = "INTEGER"
@@ -43,8 +44,8 @@ text_field_type = "TEXT"
 
 
 # query's
-create_table_sales = f"""
-CREATE TABLE {sales_table_name} (
+create_table_sales_raw = f"""
+CREATE TABLE {sales_raw_table_name} (
     {deleted_col} {int_field_type},
     {registered_col} {int_field_type},
     {doc_number_col} {int_field_type},
@@ -70,14 +71,14 @@ CREATE TABLE {sales_table_name} (
     PRIMARY KEY ({doc_number_col}, {doc_date_col}, {ta_cell_number_col})
 );
 """
-drop_table_sales = f"""DROP TABLE {sales_table_name};"""
+drop_table_sales = f"""DROP TABLE {sales_raw_table_name};"""
 
 query_sales_group_by_div = f"""SELECT
                                     {division_col},
                                     SUM({number_of_sales_col}) AS 'Кол-во',
                                     SUM({sum_of_sales_col}) AS Сумма,
                                     SUM({sum_of_sales_col}) - SUM({product_control_cost_price_col}) AS ВП
-                                FROM {sales_table_name}
+                                FROM {sales_raw_table_name}
                                 WHERE
                                     {deleted_col} = 0 AND
                                     {registered_col} = 1 AND
