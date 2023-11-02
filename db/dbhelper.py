@@ -30,6 +30,19 @@ def execute_query(connection, query):
         print("Database is not connected")
 
 
+def execute_script(connection, script):
+    if connection is not None:
+        cursor = connection.cursor()
+        try:
+            cursor.executescript(script)
+            connection.commit()
+            print("Query successful")
+        except sqlite3.DatabaseError as err:
+            print(f"Error: '{err}'")
+    else:
+        print("Database is not connected")
+
+
 def execute_read_query(connection, query, params=None):
     result = None
     if connection is not None:

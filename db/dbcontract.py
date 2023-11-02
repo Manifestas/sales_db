@@ -87,3 +87,8 @@ query_sales_group_by_div = f"""SELECT
                                     {doc_date_col} = ?
                                 GROUP BY {division_col}
                                 ORDER BY Сумма DESC;"""
+
+delete_unreg_record = f"""DELETE FROM {sales_raw_table_name}
+                          WHERE
+                            {deleted_col} = 1 OR
+                            {registered_col} = 0;"""
