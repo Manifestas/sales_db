@@ -1,24 +1,38 @@
 # db, table names
 sqlite_db_file = "./data/sqlite.db"
 sales_raw_table_name = "sales_raw"
+sales_table_name = "sales"
+organization_table_name = "organization"
+operator_table_name = "operator"
+ta_table_name = "ta"
+division_table_name = "division"
+tt_table_name = "tt"
+product_table_name = "product"
 
 # column names
+id_col = "id"
 deleted_col = "deleted"
 registered_col = "registered"
 doc_number_col = "doc_number"
 doc_date_col = "doc_date"
 doc_date_time_col = "doc_date_time"
 organization_col = "organization"
+organization_id_col = "organization_id"
 operator_col = "operator"
+operator_id_col = "operator_id"
+ta_id_col = "ta_id"
 ta_brand_col = "ta_brand"
 ta_model_col = "ta_model"
 ta_serial_col = "ta_serial"
 ta_type_col = "ta_type"
 division_col = "division"
+division_id_col = "division_id"
+tt_id_col = "tt_id"
 tt_name_col = "tt_name"
 tt_location_col = "tt_location"
 ta_cell_number_col = "ta_cell_number"
 ta_cell_is_snack_col = "ta_cell_is_snack"
+product_id_col = "product_id"
 product_col = "product"
 ta_cell_deficit_col = "ta_cell_deficit"
 number_of_sales_col = "number_of_sales"
@@ -31,8 +45,6 @@ db_column_name_list = [deleted_col, registered_col, doc_number_col, doc_date_col
                        tt_location_col, ta_cell_number_col, ta_cell_is_snack_col, product_col, ta_cell_deficit_col,
                        number_of_sales_col, sum_of_sales_col, product_cost_price_col, product_control_cost_price_col]
 
-sales_table_name = "sales"
-
 # vending machine type in db
 coffee_ta_type = "Кофейный ТА"
 snack_ta_type = "Снековый ТА"
@@ -42,8 +54,9 @@ int_field_type = "INTEGER"
 real_field_type = "REAL"
 text_field_type = "TEXT"
 
-
 # query's
+
+# creating table with source data from Excel table
 create_table_sales_raw = f"""
 CREATE TABLE {sales_raw_table_name} (
     {deleted_col} {int_field_type},
@@ -71,9 +84,91 @@ CREATE TABLE {sales_raw_table_name} (
     PRIMARY KEY ({doc_number_col}, {doc_date_col}, {ta_cell_number_col})
 );
 """
-drop_table_sales = f"""DROP TABLE {sales_raw_table_name};"""
+drop_table_sales_raw = f"""DROP TABLE {sales_raw_table_name};"""
 
-query_sales_group_by_div = f"""SELECT
+# creating normalized sales table
+create_table_sales = f"""
+CREATE TABLE IF NOT EXISTS {sales_table_name} (
+    {doc_number_col} {int_field_type},
+    {doc_date_col} {text_field_type},
+    {organization_id_col} {int_field_type},
+    {operator_id_col} {int_field_type},
+    {ta_id_col} {int_field_type},
+    {division_id_col} {text_field_type},
+    {tt_id_col} {int_field_type},
+    {ta_cell_number_col} {int_field_type},
+    {product_id_col} {int_field_type},
+    {number_of_sales_col} {int_field_type},
+    {sum_of_sales_col} {int_field_type},
+    {product_cost_price_col} {real_field_type},
+    {product_control_cost_price_col} {real_field_type},
+    FOREIGN KEY({organization_id_col}) REFERENCES {organization_table_name}({id_col}),
+    FOREIGN KEY({operator_id_col}) REFERENCES {operator_table_name}({id_col}),
+    FOREIGN KEY({ta_id_col}) REFERENCES {ta_table_name}({id_col}),
+    FOREIGN KEY({division_id_col}) REFERENCES {division_table_name}({id_col}),
+    FOREIGN KEY({tt_id_col}) REFERENCES {tt_table_name}({id_col}),
+    FOREIGN KEY({product_id_col}) REFERENCES {product_table_name}({id_col}),
+    PRIMARY KEY ({doc_number_col}, {doc_date_col}, {ta_cell_number_col})
+);
+"""
+
+create_table_organization = f"""
+CREATE TABLE IF NOT EXISTS {organization_table_name} (
+    {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
+    {organization_col} {text_field_type} NOT NULL UNIQUE
+);
+"""
+
+create_table_operator = f"""
+CREATE TABLE IF NOT EXISTS {operator_table_name} (
+    {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
+    {operator_col} {text_field_type} NOT NULL UNIQUE
+);
+"""
+
+create_table_ta = f"""
+CREATE TABLE IF NOT EXISTS {ta_table_name} (
+    {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
+    {ta_brand_col} {text_field_type},
+    {ta_model_col} {text_field_type},
+    {ta_serial_col} {text_field_type},
+    {ta_type_col} {text_field_type} NOT NULL,
+    UNIQUE({ta_brand_col}, {ta_model_col}, {ta_serial_col})
+);
+"""
+
+create_table_division = f""""
+CREATE TABLE IF NOT EXISTS {division_table_name} (
+    {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
+    {division_col} {text_field_type} NOT NULL UNIQUE
+);
+"""
+
+create_table_tt = f""""
+CREATE TABLE IF NOT EXISTS {tt_table_name} (
+    {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
+    {tt_name_col} {text_field_type} NOT NULL,
+    {tt_location_col} {text_field_type},
+    UNIQUE({tt_name_col}, {tt_location_col})
+);
+"""
+
+create_table_product = f""""
+CREATE TABLE IF NOT EXISTS {product_table_name} (
+    {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
+    {product_col} {text_field_type} NOT NULL UNIQUE
+);
+"""
+
+create_normalized_tables = "".join([create_table_sales,
+                                    create_table_organization,
+                                    create_table_operator,
+                                    create_table_ta,
+                                    create_table_division,
+                                    create_table_tt,
+                                    create_table_product])
+
+query_sales_raw_group_by_div = f"""SELECT
                                     {division_col},
                                     SUM({number_of_sales_col}) AS 'Кол-во',
                                     SUM({sum_of_sales_col}) AS Сумма,

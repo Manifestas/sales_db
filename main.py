@@ -67,7 +67,7 @@ def select_query():
     with conn:
         curs = conn.cursor()
         try:
-            print(execute_read_query(conn, query_sales_group_by_div, (coffee_ta_type, "27.10.2022")))
+            print(execute_read_query(conn, query_sales_raw_group_by_div, (coffee_ta_type, "27.10.2022")))
         except sqlite3.Error as e:
             print(f"Error: {e}")
         finally:
