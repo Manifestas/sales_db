@@ -39,14 +39,12 @@ def from_excel_to_db():
 def transfer_to_normal_table():
     conn = create_connection(sqlite_db_file)
     with conn:
-        curs = conn.cursor()
         try:
             execute_query(conn, delete_unreg_record)
+            execute_script(conn, create_normalized_tables)
+            execute_script(conn, insert_distinct_to_tables)
         except sqlite3.Error as e:
             print(f"Error: {e}")
-        finally:
-            if curs:
-                curs.close()
 
 
 def simple_read_query():
@@ -76,7 +74,7 @@ def select_query():
 
 
 def main():
-    simple_read_query()
+    transfer_to_normal_table()
 
 
 if __name__ == '__main__':

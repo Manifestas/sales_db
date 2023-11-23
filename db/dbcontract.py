@@ -137,14 +137,14 @@ CREATE TABLE IF NOT EXISTS {ta_table_name} (
 );
 """
 
-create_table_division = f""""
+create_table_division = f"""
 CREATE TABLE IF NOT EXISTS {division_table_name} (
     {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
     {division_col} {text_field_type} NOT NULL UNIQUE
 );
 """
 
-create_table_tt = f""""
+create_table_tt = f"""
 CREATE TABLE IF NOT EXISTS {tt_table_name} (
     {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
     {tt_name_col} {text_field_type} NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS {tt_table_name} (
 );
 """
 
-create_table_product = f""""
+create_table_product = f"""
 CREATE TABLE IF NOT EXISTS {product_table_name} (
     {id_col} {int_field_type} PRIMARY KEY AUTOINCREMENT,
     {product_col} {text_field_type} NOT NULL UNIQUE
@@ -168,22 +168,70 @@ create_normalized_tables = "".join([create_table_sales,
                                     create_table_tt,
                                     create_table_product])
 
-query_sales_raw_group_by_div = f"""SELECT
-                                    {division_col},
-                                    SUM({number_of_sales_col}) AS 'Кол-во',
-                                    SUM({sum_of_sales_col}) AS Сумма,
-                                    SUM({sum_of_sales_col}) - SUM({product_control_cost_price_col}) AS ВП
-                                FROM {sales_raw_table_name}
-                                WHERE
-                                    {deleted_col} = 0 AND
-                                    {registered_col} = 1 AND
-                                    {ta_type_col} = ? AND
-                                    {ta_cell_number_col} <= 90 AND
-                                    {doc_date_col} = ?
-                                GROUP BY {division_col}
-                                ORDER BY Сумма DESC;"""
+query_sales_raw_group_by_div = f"""
+SELECT
+    {division_col},
+    SUM({number_of_sales_col}) AS 'Кол-во',
+    SUM({sum_of_sales_col}) AS Сумма,
+    SUM({sum_of_sales_col}) - SUM({product_control_cost_price_col}) AS ВП
+FROM {sales_raw_table_name}
+WHERE
+    {deleted_col} = 0 AND
+    {registered_col} = 1 AND
+    {ta_type_col} = ? AND
+    {ta_cell_number_col} <= 90 AND
+    {doc_date_col} = ?
+GROUP BY {division_col}
+ORDER BY Сумма DESC;
+"""
 
-delete_unreg_record = f"""DELETE FROM {sales_raw_table_name}
-                          WHERE
-                            {deleted_col} = 1 OR
-                            {registered_col} = 0;"""
+delete_unreg_record = f"""
+DELETE FROM {sales_raw_table_name}
+WHERE
+    {deleted_col} = 1 OR
+    {registered_col} = 0;
+"""
+
+insert_distinct_organization = f"""
+INSERT OR IGNORE  INTO {organization_table_name} ({organization_col})
+SELECT DISTINCT {organization_col}  FROM {sales_raw_table_name};
+"""
+
+insert_distinct_operator = f"""
+INSERT OR IGNORE  INTO {operator_table_name} ({operator_col})
+SELECT DISTINCT {operator_col}  FROM {sales_raw_table_name};
+"""
+
+insert_distinct_ta = f"""
+INSERT OR IGNORE  INTO {ta_table_name} ({ta_brand_col},
+                                        {ta_model_col},
+                                        {ta_serial_col},
+                                        {ta_type_col})
+SELECT DISTINCT {ta_brand_col},
+                {ta_model_col},
+                {ta_serial_col},
+                {ta_type_col}                
+FROM {sales_raw_table_name};
+"""
+
+insert_distinct_division = f"""
+INSERT OR IGNORE  INTO {division_table_name} ({division_col})
+SELECT DISTINCT {division_col}  FROM {sales_raw_table_name};
+"""
+
+insert_distinct_tt = f"""
+INSERT OR IGNORE  INTO {tt_table_name} ({tt_name_col}, {tt_location_col})
+SELECT DISTINCT {tt_name_col}, {tt_location_col}  FROM {sales_raw_table_name};
+"""
+
+insert_distinct_product = f"""
+INSERT OR IGNORE  INTO {product_table_name} ({product_col})
+SELECT DISTINCT {product_col}  FROM {sales_raw_table_name};
+"""
+
+insert_distinct_to_tables = "".join([insert_distinct_organization,
+                                     insert_distinct_operator,
+                                     insert_distinct_ta,
+                                     insert_distinct_division,
+                                     insert_distinct_tt,
+                                     insert_distinct_product])

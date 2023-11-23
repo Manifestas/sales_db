@@ -36,7 +36,7 @@ def execute_script(connection, script):
         try:
             cursor.executescript(script)
             connection.commit()
-            print("Query successful")
+            print("Query script successful")
         except sqlite3.DatabaseError as err:
             print(f"Error: '{err}'")
     else:
