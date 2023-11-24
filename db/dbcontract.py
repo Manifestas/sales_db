@@ -92,13 +92,13 @@ create_table_sales = f"""
 CREATE TABLE IF NOT EXISTS {sales_table_name} (
     {doc_number_col} {int_field_type},
     {doc_date_col} {text_field_type},
-    {organization_id_col} {int_field_type},
-    {operator_id_col} {int_field_type},
-    {ta_id_col} {int_field_type},
-    {division_id_col} {text_field_type},
-    {tt_id_col} {int_field_type},
+    {organization_id_col} {int_field_type} DEFAULT NULL,
+    {operator_id_col} {int_field_type} DEFAULT NULL,
+    {ta_id_col} {int_field_type} DEFAULT NULL,
+    {division_id_col} {text_field_type} DEFAULT NULL,
+    {tt_id_col} {int_field_type} DEFAULT NULL,
     {ta_cell_number_col} {int_field_type},
-    {product_id_col} {int_field_type},
+    {product_id_col} {int_field_type} DEFAULT NULL,
     {number_of_sales_col} {int_field_type},
     {sum_of_sales_col} {int_field_type},
     {product_cost_price_col} {real_field_type},
@@ -254,20 +254,19 @@ SELECT
     {product_cost_price_col},
     {product_control_cost_price_col}
 FROM {sales_raw_table_name}
-INNER JOIN {ta_table_name}
+LEFT JOIN {ta_table_name}
     ON {sales_raw_table_name}.{ta_brand_col} = {ta_table_name}.{ta_brand_col} 
     AND {sales_raw_table_name}.{ta_model_col}  = {ta_table_name}.{ta_model_col} 
     AND {sales_raw_table_name}.{ta_serial_col}  = {ta_table_name}.{ta_serial_col}
-INNER JOIN {organization_table_name}
+LEFT JOIN {organization_table_name}
     ON {sales_raw_table_name}.{organization_col}  = {organization_table_name}.{organization_col}
-INNER JOIN {operator_table_name}
+LEFT JOIN {operator_table_name}
     ON {sales_raw_table_name}.{operator_col} = {operator_table_name}.{operator_col}
-INNER JOIN {division_table_name}
+LEFT JOIN {division_table_name}
     ON {sales_raw_table_name}.{division_col} = {division_table_name}.{division_col}
-INNER JOIN {tt_table_name}
+LEFT JOIN {tt_table_name}
     ON {sales_raw_table_name}.{tt_name_col} = {tt_table_name}.{tt_name_col}
     AND {sales_raw_table_name}.{tt_location_col} = {tt_table_name}.{tt_location_col}
-INNER JOIN {product_col}
+LEFT JOIN {product_col}
     ON {sales_raw_table_name}.{product_col} = {product_col}.{product_col}
-LIMIT 10
 ;"""
