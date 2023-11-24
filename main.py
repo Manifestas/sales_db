@@ -43,6 +43,7 @@ def transfer_to_normal_table():
             execute_query(conn, delete_unreg_record)
             execute_script(conn, create_normalized_tables)
             execute_script(conn, insert_distinct_to_tables)
+            execute_query(conn, migrate_from_sales_raw_to_sales)
         except sqlite3.Error as e:
             print(f"Error: {e}")
 

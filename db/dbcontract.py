@@ -85,6 +85,7 @@ CREATE TABLE {sales_raw_table_name} (
 );
 """
 drop_table_sales_raw = f"""DROP TABLE {sales_raw_table_name};"""
+clear_table_sales_raw = f"DELETE FROM {sales_raw_table_name};"
 
 # creating normalized sales table
 create_table_sales = f"""
@@ -235,3 +236,38 @@ insert_distinct_to_tables = "".join([insert_distinct_organization,
                                      insert_distinct_division,
                                      insert_distinct_tt,
                                      insert_distinct_product])
+
+migrate_from_sales_raw_to_sales = f"""
+INSERT OR IGNORE INTO {sales_table_name}
+SELECT
+    {doc_number_col},
+    {doc_date_col},
+    {organization_table_name}.{id_col},
+    {operator_table_name}.{id_col},
+    {ta_table_name}.{id_col},
+    {division_table_name}.{id_col},
+    {tt_table_name}.{id_col},
+    {ta_cell_number_col},
+    {product_table_name}.{id_col},
+    {number_of_sales_col},
+    {sum_of_sales_col},
+    {product_cost_price_col},
+    {product_control_cost_price_col}
+FROM {sales_raw_table_name}
+INNER JOIN {ta_table_name}
+    ON {sales_raw_table_name}.{ta_brand_col} = {ta_table_name}.{ta_brand_col} 
+    AND {sales_raw_table_name}.{ta_model_col}  = {ta_table_name}.{ta_model_col} 
+    AND {sales_raw_table_name}.{ta_serial_col}  = {ta_table_name}.{ta_serial_col}
+INNER JOIN {organization_table_name}
+    ON {sales_raw_table_name}.{organization_col}  = {organization_table_name}.{organization_col}
+INNER JOIN {operator_table_name}
+    ON {sales_raw_table_name}.{operator_col} = {operator_table_name}.{operator_col}
+INNER JOIN {division_table_name}
+    ON {sales_raw_table_name}.{division_col} = {division_table_name}.{division_col}
+INNER JOIN {tt_table_name}
+    ON {sales_raw_table_name}.{tt_name_col} = {tt_table_name}.{tt_name_col}
+    AND {sales_raw_table_name}.{tt_location_col} = {tt_table_name}.{tt_location_col}
+INNER JOIN {product_col}
+    ON {sales_raw_table_name}.{product_col} = {product_col}.{product_col}
+LIMIT 10
+;"""
