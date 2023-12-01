@@ -61,7 +61,7 @@ create_table_sales_raw = f"""
 CREATE TABLE {sales_raw_table_name} (
     {deleted_col} {int_field_type},
     {registered_col} {int_field_type},
-    {doc_number_col} {int_field_type},
+    {doc_number_col} {text_field_type},
     {doc_date_col} {text_field_type},
     {doc_date_time_col} {text_field_type},
     {organization_col} {text_field_type},
@@ -90,12 +90,12 @@ clear_table_sales_raw = f"DELETE FROM {sales_raw_table_name};"
 # creating normalized sales table
 create_table_sales = f"""
 CREATE TABLE IF NOT EXISTS {sales_table_name} (
-    {doc_number_col} {int_field_type},
+    {doc_number_col} {text_field_type},
     {doc_date_col} {text_field_type},
     {organization_id_col} {int_field_type} DEFAULT NULL,
     {operator_id_col} {int_field_type} DEFAULT NULL,
     {ta_id_col} {int_field_type} DEFAULT NULL,
-    {division_id_col} {text_field_type} DEFAULT NULL,
+    {division_id_col} {int_field_type} DEFAULT NULL,
     {tt_id_col} {int_field_type} DEFAULT NULL,
     {ta_cell_number_col} {int_field_type},
     {product_id_col} {int_field_type} DEFAULT NULL,
