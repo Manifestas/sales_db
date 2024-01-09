@@ -58,7 +58,7 @@ text_field_type = "TEXT"
 
 # creating table with source data from Excel table
 create_table_sales_raw = f"""
-CREATE TABLE {sales_raw_table_name} (
+CREATE TABLE IF NOT EXISTS {sales_raw_table_name} (
     {deleted_col} {int_field_type},
     {registered_col} {int_field_type},
     {doc_number_col} {text_field_type},
@@ -81,7 +81,7 @@ CREATE TABLE {sales_raw_table_name} (
     {sum_of_sales_col} {int_field_type},
     {product_cost_price_col} {real_field_type},
     {product_control_cost_price_col} {real_field_type},
-    PRIMARY KEY ({doc_number_col}, {doc_date_col}, {ta_cell_number_col})
+    PRIMARY KEY ({doc_number_col}, {doc_date_col}, {ta_type_col}, {ta_cell_number_col})
 );
 """
 drop_table_sales_raw = f"""DROP TABLE {sales_raw_table_name};"""
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS {sales_table_name} (
     FOREIGN KEY({division_id_col}) REFERENCES {division_table_name}({id_col}),
     FOREIGN KEY({tt_id_col}) REFERENCES {tt_table_name}({id_col}),
     FOREIGN KEY({product_id_col}) REFERENCES {product_table_name}({id_col}),
-    PRIMARY KEY ({doc_number_col}, {doc_date_col}, {ta_cell_number_col})
+    PRIMARY KEY ({doc_number_col}, {doc_date_col}, {ta_id_col}, {ta_cell_number_col})
 );
 """
 

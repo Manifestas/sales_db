@@ -6,14 +6,13 @@ from db import *
 
 
 def from_excel_to_db():
-    xls_file_dir_name = "./data/excel/2022/"
+    xls_file_dir_name = "./data/excel/2023/"
     xls_files_list = os.listdir(xls_file_dir_name)
     conn = create_connection(sqlite_db_file)
     with conn:
         curs = conn.cursor()
         try:
             execute_query(conn, create_table_sales_raw)
-            # print(execute_read_query(conn, "PRAGMA encoding;"))
             for xls_file in xls_files_list:
                 """in sheet.py comment 3 lines:
                  #if self.biff_version >= 80:
@@ -52,7 +51,7 @@ def simple_read_query():
     with conn:
         curs = conn.cursor()
         try:
-            print(execute_read_query(conn, f"ALTER TABLE sales RENAME TO {sales_raw_table_name}"))
+            print(execute_read_query(conn, create_table_sales))
         except sqlite3.Error as e:
             print(f"Error: {e}")
         finally:
@@ -74,7 +73,7 @@ def select_query():
 
 
 def main():
-    transfer_to_normal_table()
+    simple_read_query()
 
 
 if __name__ == '__main__':
