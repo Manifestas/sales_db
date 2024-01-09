@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import xlrd
 
+import processing
 from db import *
 
 
@@ -73,7 +74,7 @@ def select_query():
 
 
 def main():
-    simple_read_query()
+    processing.export_tables_to_csv()
 
 
 if __name__ == '__main__':
