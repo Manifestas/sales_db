@@ -41,7 +41,7 @@ def process_table_sales():
                                                 product_control_cost_price_col])
     combo_id = "combo_id"
     uniq_combo_id[combo_id] = range(1, len(uniq_combo_id) + 1)
-    uniq_combo_id.to_csv(f"{TEMP_DIR_NAME}{combo_id}.csv")
+    uniq_combo_id.to_csv(f"{TEMP_DIR_NAME}{combo_id}.csv", index=False)
 
     sales_group = sales_group.merge(uniq_combo_id, how='left')
     sales_group.drop(labels=[doc_date_col, ta_id_col, division_id_col, tt_id_col], axis=1, inplace=True)
