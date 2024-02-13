@@ -8,10 +8,10 @@ TEMP_DIR_NAME = "./temp/"
 
 
 def export_tables_to_csv():
-    table_to_sql(division_table_name)
-    table_to_sql(ta_table_name)
-    table_to_sql(tt_table_name)
-    table_to_sql(product_table_name)
+    table_to_csv(division_table_name)
+    table_to_csv(ta_table_name)
+    table_to_csv(tt_table_name)
+    table_to_csv(product_table_name)
     process_table_sales()
 
 
@@ -48,7 +48,7 @@ def process_table_sales():
     sales_group.to_csv(f"{TEMP_DIR_NAME}{sales_table_name}.csv", index=False)
 
 
-def table_to_sql(table_name):
+def table_to_csv(table_name):
     if not os.path.isdir(TEMP_DIR_NAME):
         os.mkdir(TEMP_DIR_NAME)
         print(f"{TEMP_DIR_NAME} directory created")

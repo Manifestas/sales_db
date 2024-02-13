@@ -7,7 +7,7 @@ from db import *
 
 
 def from_excel_to_db():
-    xls_file_dir_name = "./data/excel/2023/"
+    xls_file_dir_name = "./data/excel/2024/"
     xls_files_list = os.listdir(xls_file_dir_name)
     conn = create_connection(sqlite_db_file)
     with conn:
@@ -74,6 +74,8 @@ def select_query():
 
 
 def main():
+    from_excel_to_db()
+    transfer_to_normal_table()
     processing.export_tables_to_csv()
 
 
