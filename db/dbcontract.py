@@ -270,3 +270,9 @@ LEFT JOIN {tt_table_name}
 LEFT JOIN {product_col}
     ON {sales_raw_table_name}.{product_col} = {product_col}.{product_col}
 ;"""
+
+delete_all_from_sales_raw = f"""
+DELETE FROM {sales_raw_table_name}
+;"""
+
+vacuum = "VACUUM"
